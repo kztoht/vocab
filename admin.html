@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <style>
+    body {
+      font-family: Calibri, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    h1 {
+      font-size: 24px;
+      text-align: center;
+    }
+    .button {
+      margin-top: 6px;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .stats {
+      margin: 20px 0;
+      background: #fff;
+      padding: 12px;
+      border-radius: 6px;
+      box-shadow: 0 0 4px rgba(0,0,0,0.05);
+    }
+    .level-title {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin Panel</h1>
+
+  <div class="level-title">Level 500</div>
+  <div class="stats">
+    <p id="score500A"></p>
+    <button class="button" onclick="resetStats('500A')">Reset A</button>
+    <p id="score500B"></p>
+    <button class="button" onclick="resetStats('500B')">Reset B</button>
+  </div>
+
+  <div class="level-title">Level 700</div>
+  <div class="stats">
+    <p id="score700A"></p>
+    <button class="button" onclick="resetStats('700A')">Reset A</button>
+    <p id="score700B"></p>
+    <button class="button" onclick="resetStats('700B')">Reset B</button>
+  </div>
+
+  <div class="level-title">Level 990</div>
+  <div class="stats">
+    <p id="score990A"></p>
+    <button class="button" onclick="resetStats('990A')">Reset A</button>
+    <p id="score990B"></p>
+    <button class="button" onclick="resetStats('990B')">Reset B</button>
+  </div>
+
+  <script>
+    function showStats() {
+      updateStats("500A", "score500A");
+      updateStats("500B", "score500B");
+      updateStats("700A", "score700A");
+      updateStats("700B", "score700B");
+      updateStats("990A", "score990A");
+      updateStats("990B", "score990B");
+    }
+
+    function updateStats(key, elementId) {
+      const correct = parseInt(localStorage.getItem("vocabCorrect" + key)) || 0;
+      const total = parseInt(localStorage.getItem("vocabTotal" + key)) || 0;
+      const percent = total > 0 ? ((correct / total) * 100).toFixed(1) : "0.0";
+      document.getElementById(elementId).innerText = `${key}: ${correct} / ${total} (${percent}%)`;
+    }
+
+    function resetStats(key) {
+      if (confirm(`Reset stats for ${key}?`)) {
+        localStorage.setItem("vocabCorrect" + key, "0");
+        localStorage.setItem("vocabTotal" + key, "0");
+        showStats();
+        alert(`Stats for ${key} have been reset.`);
+      }
+    }
+
+    showStats();
+  </script>
+</body>
+</html>

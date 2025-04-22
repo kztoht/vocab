@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOEIC Vocabulary Quiz</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .quiz-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: auto;
+    }
+    .question {
+      margin-bottom: 15px;
+    }
+    .choices label {
+      display: block;
+      margin-bottom: 8px;
+    }
+    .result-summary {
+      margin-top: 20px;
+      background-color: #f0f8ff;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    @media screen and (max-width: 600px) {
+      body {
+        font-size: 18px;
+        padding: 10px;
+      }
+      .quiz-box {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-box">
+    <h1>TOEIC Vocabulary Quiz</h1>
+    <div id="question-container"></div>
+    <button id="submit-btn">Submit</button>
+    <div id="result" class="result-summary" style="display:none;"></div>
+    <button id="restart-btn" style="display:none;">Try Again</button>
+  </div>
+
+  <script>
+    const fullQuizData = [
+      { q: "I opened a bank [    ] to save money for a trip.", c: ["advice", "account", "accident", "answer"], a: "account" },
+      { q: "The teacher made an [    ] about the test next week.", c: ["accident", "agreement", "announcement", "apartment"], a: "announcement" },
+      { q: "I have a doctor's [    ] at 3 p.m.", c: ["apartment", "appointment", "argument", "attention"], a: "appointment" },
+      { q: "My parents did not [    ] of my new haircut.", c: ["appear", "allow", "approve", "answer"], a: "approve" },
+      { q: "I checked my bank [    ] online.", c: ["button", "balance", "basket", "benefit"], a: "balance" },
+      { q: "A big [    ] of this job is free lunch.", c: ["business", "break", "benefit", "band"], a: "benefit" },
+      { q: "[    ] will begin at Gate 5 in ten minutes.", c: ["Boarding", "Building", "Buying", "Boring"], a: "Boarding" },
+      { q: "We don’t have enough money in the [    ] for a new computer.", c: ["building", "budget", "button", "bottle"], a: "budget" },
+      { q: "I saw a nice chair in the furniture [    ] .", c: ["catalog", "cartoon", "capital", "college"], a: "catalog" },
+      { q: "The lawyer met with a new [    ] this morning.", c: ["cousin", "client", "cleaner", "captain"], a: "client" },
+      { q: "She had lunch with her [    ] at the office.", c: ["calendar", "colleague", "cousin", "customer"], a: "colleague" },
+      { q: "The boss is at a business [    ] in Tokyo.", c: ["concert", "conference", "convenience", "connection"], a: "conference" },
+      { q: "He signed the [    ] to start his new job.", c: ["contact", "concert", "contract", "context"], a: "contract" },
+      { q: "The [    ] of the new phone is too high for me.", c: ["copy", "cost", "coin", "course"], a: "cost" },
+      { q: "We must finish this project before the [    ] .", c: ["decision", "deadline", "discount", "detail"], a: "deadline" },
+      { q: "The train had a 10-minute [    ] .", c: ["danger", "delay", "dessert", "design"], a: "delay" },
+      { q: "The pizza [    ] was late last night.", c: ["delivery", "decision", "directory", "discovery"], a: "delivery" },
+      { q: "He works in the sales [    ] .", c: ["department", "development", "delivery", "decision"], a: "department" },
+      { q: "I made a $100 [    ] to open the account.", c: ["deposit", "discount", "design", "dialogue"], a: "deposit" },
+      { q: "Please print the [    ] before the meeting.", c: ["document", "development", "demand", "design"], a: "document" },
+      { q: "The new [    ] started yesterday.", c: ["employee", "employer", "editor", "engineer"], a: "employee" },
+      { q: "Travel [    ] is not included.", c: ["expense", "expect", "example", "expand"], a: "expense" },
+      { q: "This [    ] has a gym and a pool.", c: ["facility", "faculty", "feature", "feeling"], a: "facility" },
+      { q: "She studies [    ] at university.", c: ["finance", "final", "flight", "figure"], a: "finance" },
+      { q: "My office is on the third [    ] .", c: ["floor", "flower", "file", "folder"], a: "floor" },
+      { q: "I got good [    ] on my project.", c: ["feedback", "feature", "feeling", "figure"], a: "feedback" },
+      { q: "We need to [    ] more staff.", c: ["hire", "help", "hope", "hit"], a: "hire" },
+      { q: "Check the [    ] before making an order.", c: ["inventory", "invoice", "inquiry", "introduction"], a: "inventory" },
+      { q: "Real estate is a good [    ] .", c: ["investment", "interest", "involvement", "invite"], a: "investment" },
+      { q: "The [    ] must be paid within 30 days.", c: ["invoice", "inventory", "income", "inquiry"], a: "invoice" },
+      { q: "I found the [    ] I wanted online.", c: ["item", "idea", "issue", "image"], a: "item" },
+      { q: "Regular [    ] keeps machines working.", c: ["maintenance", "management", "movement", "mention"], a: "maintenance" },
+      { q: "The [    ] gave us a task.", c: ["manager", "member", "maker", "monitor"], a: "manager" },
+      { q: "I wrote a [    ] to explain the rules.", c: ["memo", "message", "mention", "meeting"], a: "memo" },
+      { q: "They placed an [    ] for 10 chairs.", c: ["order", "offer", "other", "owner"], a: "order" },
+      { q: "He gets paid for [    ] work.", c: ["overtime", "output", "outline", "outside"], a: "overtime" },
+      { q: "The [    ] is due by Friday.", c: ["payment", "partner", "position", "picture"], a: "payment" },
+      { q: "Her [    ] was very clear.", c: ["presentation", "preparation", "pressure", "president"], a: "presentation" },
+      { q: "We made a big [    ] last year.", c: ["profit", "project", "promise", "problem"], a: "profit" },
+      { q: "He got a [    ] last month.", c: ["promotion", "protection", "production", "position"], a: "promotion" },
+      { q: "She gave a [    ] to the team.", c: ["proposal", "purpose", "position", "property"], a: "proposal" },
+      { q: "I want to [    ] a new laptop.", c: ["purchase", "process", "promise", "partner"], a: "purchase" },
+      { q: "I lost the [    ] for my shirt.", c: ["receipt", "reason", "research", "repeat"], a: "receipt" },
+      { q: "They gave me a [    ] for the shoes.", c: ["refund", "report", "replay", "remind"], a: "refund" },
+      { q: "The hotel is closed for [    ] .", c: ["renovation", "reservation", "reception", "reflection"], a: "renovation" },
+      { q: "He finished writing the [    ] .", c: ["report", "resort", "respect", "repeat"], a: "report" },
+      { q: "I will [    ] from this job soon.", c: ["resign", "remain", "return", "review"], a: "resign" },
+      { q: "She made a [    ] at the store.", c: ["return", "repeat", "review", "remove"], a: "return" },
+      { q: "The [    ] was delayed by one day.", c: ["shipping", "shopping", "shaping", "shooting"], a: "shipping" },
+      { q: "Our [    ] is based in Osaka.", c: ["supplier", "supporter", "supervisor", "supermarket"], a: "supplier" },
+    ];
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    const quizData = shuffle([...fullQuizData]).slice(0, 10);
+    let currentQuestion = 0;
+    let score = 0;
+    const container = document.getElementById("question-container");
+    const result = document.getElementById("result");
+    const submitBtn = document.getElementById("submit-btn");
+    const restartBtn = document.getElementById("restart-btn");
+
+    function loadQuestion() {
+      const q = quizData[currentQuestion];
+      container.innerHTML = `
+        <div class="question">
+          <p><strong>Question ${currentQuestion + 1} of 10</strong></p>
+          <p>${q.q}</p>
+          <div class="choices">
+            ${q.c.map(choice => `
+              <label><input type="radio" name="choice" value="${choice}"> ${choice}</label>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    submitBtn.addEventListener("click", () => {
+      const selected = document.querySelector('input[name="choice"]:checked');
+      if (!selected) return;
+      if (selected.value === quizData[currentQuestion].a) score++;
+      currentQuestion++;
+      if (currentQuestion < 10) {
+        loadQuestion();
+      } else {
+        container.innerHTML = "";
+        result.style.display = "block";
+        result.innerHTML = `<p>You scored ${score} out of 10.</p>`;
+        submitBtn.style.display = "none";
+        restartBtn.style.display = "inline-block";
+        const correct = parseInt(localStorage.getItem("vocabCorrect")) || 0;
+        const total = parseInt(localStorage.getItem("vocabTotal")) || 0;
+        localStorage.setItem("vocabCorrect", correct + score);
+        localStorage.setItem("vocabTotal", total + 10);
+      }
+    });
+
+    restartBtn.addEventListener("click", () => {
+      location.reload();
+    });
+
+    loadQuestion();
+  </script>
+</body>
+</html>

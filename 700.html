@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOEIC Level 700 Quiz</title>
+  <style>
+    body {
+      font-family: Calibri, sans-serif;
+      background-color: #f9f9f9;
+      padding: 20px;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: auto;
+    }
+    .quiz-box {
+      background-color: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+    .question {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .choices label {
+      display: block;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    #summary {
+      background: #e0f7fa;
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>TOEIC Level 700 Quiz</h1>
+  <div id="quiz-container"></div>
+  <button id="submit-btn">Submit Answers</button>
+  <div id="summary" style="display:none;"></div>
+  <button id="restart-btn" style="display:none;">Try Again</button>
+
+  <script>
+    const level = "700";
+    const mode = (new URLSearchParams(location.search).get("mode") === "B") ? "B" : "A";
+
+    const fullQuizData = [
+      {
+        question: "The manager decided to [    ] extra funds to the training department.",
+        options: ["allocate", "improve", "manage", "submit"],
+        answer: "allocate"
+      },
+      {
+        question: "The factory installed an [    ] system to improve efficiency.",
+        options: ["submit", "manage", "observe", "automated"],
+        answer: "automated"
+      },
+      {
+        question: "Students must [    ] in the course before the deadline.",
+        options: ["submit", "improve", "enroll", "observe"],
+        answer: "enroll"
+      },
+      {
+        question: "The company plans to [    ] the contract to include new safety regulations.",
+        options: ["manage", "improve", "submit", "amend"],
+        answer: "amend"
+      },
+      {
+        question: "Please [    ] a copy of your ID with the application form.",
+        options: ["manage", "observe", "enclose", "submit"],
+        answer: "enclose"
+      },
+      {
+        question: "The customer filed a [    ] about the poor service at the restaurant.",
+        options: ["submit", "complaint", "manage", "improve"],
+        answer: "complaint"
+      },
+      {
+        question: "All employees are expected to [    ] with the new health guidelines.",
+        options: ["submit", "manage", "comply", "improve"],
+        answer: "comply"
+      },
+      {
+        question: "The hotel will [    ] all guest rooms over the summer.",
+        options: ["manage", "renovate", "improve", "submit"],
+        answer: "renovate"
+      },
+      {
+        question: "Due to the storm, they had to [    ] the outdoor concert.",
+        options: ["postpone", "improve", "manage", "submit"],
+        answer: "postpone"
+      },
+      {
+        question: "Make sure the address on the package matches the intended [    ].",
+        options: ["improve", "observe", "manage", "recipient"],
+        answer: "recipient"
+      },
+      {
+        question: "She failed to [    ] the help she received from her team.",
+        options: ["manage", "observe", "improve", "acknowledge"],
+        answer: "acknowledge"
+      },
+      {
+        question: "The startup hopes to [    ] more funding in the next quarter.",
+        options: ["submit", "manage", "acquire", "observe"],
+        answer: "acquire"
+      },
+      {
+        question: "They offer [    ] housing options for low-income families.",
+        options: ["manage", "improve", "affordable", "submit"],
+        answer: "affordable"
+      },
+      {
+        question: "Engineers will [    ] the parts in the final stage of production.",
+        options: ["observe", "assemble", "submit", "improve"],
+        answer: "assemble"
+      },
+      {
+        question: "The company will [    ] the risks before launching the new product.",
+        options: ["assess", "improve", "submit", "observe"],
+        answer: "assess"
+      },
+      {
+        question: "He completed the [    ] before the due date.",
+        options: ["assignment", "improve", "submit", "observe"],
+        answer: "assignment"
+      },
+      {
+        question: "People often [    ] success with hard work.",
+        options: ["observe", "submit", "associate", "manage"],
+        answer: "associate"
+      },
+      {
+        question: "I [    ] you that everything is under control.",
+        options: ["improve", "manage", "assure", "observe"],
+        answer: "assure"
+      },
+      {
+        question: "You must [    ] the meeting to stay informed.",
+        options: ["attend", "submit", "observe", "manage"],
+        answer: "attend"
+      },
+      {
+        question: "The firm will [    ] its financial records annually.",
+        options: ["improve", "audit", "submit", "manage"],
+        answer: "audit"
+      },
+      {
+        question: "Only the manager can [    ] access to the data.",
+        options: ["authorize", "improve", "manage", "observe"],
+        answer: "authorize"
+      },
+      {
+        question: "The item is [    ] in three different colors.",
+        options: ["manage", "improve", "available", "submit"],
+        answer: "available"
+      },
+      {
+        question: "Public [    ] about climate change is growing.",
+        options: ["submit", "awareness", "manage", "observe"],
+        answer: "awareness"
+      },
+      {
+        question: "The company filed for [    ] after years of losses.",
+        options: ["bankruptcy", "improve", "manage", "submit"],
+        answer: "bankruptcy"
+      },
+      {
+        question: "Each guest was offered a [    ] on arrival.",
+        options: ["manage", "improve", "beverage", "submit"],
+        answer: "beverage"
+      },
+      {
+        question: "She gave a [    ] summary of the report.",
+        options: ["observe", "submit", "manage", "brief"],
+        answer: "brief"
+      },
+      {
+        question: "They [    ] the event live on the internet.",
+        options: ["manage", "broadcast", "improve", "submit"],
+        answer: "broadcast"
+      },
+      {
+        question: "The conference room has a [    ] of 200 people.",
+        options: ["submit", "observe", "capacity", "manage"],
+        answer: "capacity"
+      },
+      {
+        question: "You need a [    ] to apply for the job.",
+        options: ["certificate", "manage", "improve", "observe"],
+        answer: "certificate"
+      },
+      {
+        question: "He has to [    ] two hours every day.",
+        options: ["observe", "improve", "submit", "commute"],
+        answer: "commute"
+      },
+      {
+        question: "The hotel offers [    ] breakfast.",
+        options: ["complimentary", "observe", "improve", "submit"],
+        answer: "complimentary"
+      },
+      {
+        question: "The CEO will [    ] the meeting with remarks.",
+        options: ["manage", "conclude", "submit", "improve"],
+        answer: "conclude"
+      },
+      {
+        question: "Please [    ] your attendance by email.",
+        options: ["improve", "manage", "observe", "confirm"],
+        answer: "confirm"
+      },
+      {
+        question: "She worked for five [    ] days without a break.",
+        options: ["consecutive", "manage", "submit", "improve"],
+        answer: "consecutive"
+      },
+      {
+        question: "We hired a [    ] to improve efficiency.",
+        options: ["observe", "improve", "consultant", "submit"],
+        answer: "consultant"
+      },
+      {
+        question: "Energy [    ] has increased this year.",
+        options: ["submit", "consumption", "improve", "observe"],
+        answer: "consumption"
+      },
+      {
+        question: "The [    ] completed the work on time.",
+        options: ["manage", "improve", "submit", "contractor"],
+        answer: "contractor"
+      },
+      {
+        question: "Online shopping is very [    ].",
+        options: ["improve", "manage", "submit", "convenient"],
+        answer: "convenient"
+      },
+      {
+        question: "She works in the [    ] office downtown.",
+        options: ["manage", "submit", "improve", "corporate"],
+        answer: "corporate"
+      },
+      {
+        question: "All [    ] should be kept on file.",
+        options: ["correspondence", "manage", "improve", "observe"],
+        answer: "correspondence"
+      },
+      {
+        question: "The [    ] delivered the package early.",
+        options: ["observe", "manage", "courier", "improve"],
+        answer: "courier"
+      },
+      {
+        question: "Applicants must meet all [    ].",
+        options: ["improve", "observe", "submit", "criteria"],
+        answer: "criteria"
+      },
+      {
+        question: "Sales showed a [    ] in the second quarter.",
+        options: ["decline", "submit", "manage", "improve"],
+        answer: "decline"
+      },
+      {
+        question: "The product was returned because it was [    ].",
+        options: ["manage", "defective", "observe", "submit"],
+        answer: "defective"
+      },
+      {
+        question: "We need to [    ] tasks effectively.",
+        options: ["improve", "delegate", "submit", "manage"],
+        answer: "delegate"
+      },
+      {
+        question: "Let me [    ] how to use the machine.",
+        options: ["observe", "submit", "demonstrate", "improve"],
+        answer: "demonstrate"
+      },
+      {
+        question: "They [    ] recognition for their hard work.",
+        options: ["submit", "observe", "deserve", "manage"],
+        answer: "deserve"
+      },
+      {
+        question: "Paris was their final [    ].",
+        options: ["observe", "submit", "destination", "manage"],
+        answer: "destination"
+      },
+      {
+        question: "The leaflets were [    ]d throughout the city.",
+        options: ["distribute", "submit", "improve", "observe"],
+        answer: "distribute"
+      },
+      {
+        question: "Shareholders will receive a [    ] this month.",
+        options: ["observe", "dividend", "submit", "manage"],
+        answer: "dividend"
+      },
+      {
+        question: "He made a large [    ] to charity.",
+        options: ["donation", "observe", "submit", "manage"],
+        answer: "donation"
+      },
+      {
+        question: "Only [    ] members can vote.",
+        options: ["observe", "submit", "manage", "eligible"],
+        answer: "eligible"
+      },
+      {
+        question: "The new law will be strictly [    ]d.",
+        options: ["enforce", "manage", "improve", "observe"],
+        answer: "enforce"
+      },
+      {
+        question: "The [    ] started her first business at 18.",
+        options: ["entrepreneur", "improve", "observe", "submit"],
+        answer: "entrepreneur"
+      },
+      {
+        question: "Can you [    ] the cost of repairs?",
+        options: ["submit", "estimate", "manage", "improve"],
+        answer: "estimate"
+      },
+      {
+        question: "We need to [    ] the results.",
+        options: ["evaluate", "improve", "submit", "manage"],
+        answer: "evaluate"
+      },
+      {
+        question: "The price may [    ] our budget.",
+        options: ["observe", "submit", "exceed", "improve"],
+        answer: "exceed"
+      },
+      {
+        question: "This offer is [    ] to members.",
+        options: ["improve", "manage", "exclusive", "observe"],
+        answer: "exclusive"
+      },
+      {
+        question: "The museum will [    ] rare paintings.",
+        options: ["observe", "exhibit", "manage", "improve"],
+        answer: "exhibit"
+      },
+      {
+        question: "They plan to [    ] into new markets.",
+        options: ["improve", "expand", "observe", "submit"],
+        answer: "expand"
+      },
+      {
+        question: "My passport will [    ] next year.",
+        options: ["manage", "expire", "observe", "submit"],
+        answer: "expire"
+      },
+      {
+        question: "He asked for an [    ] on the deadline.",
+        options: ["improve", "manage", "submit", "extension"],
+        answer: "extension"
+      },
+      {
+        question: "We aim to [    ] better communication.",
+        options: ["facilitate", "observe", "improve", "submit"],
+        answer: "facilitate"
+      },
+      {
+        question: "The phone [    ]s a high-resolution camera.",
+        options: ["manage", "feature", "submit", "observe"],
+        answer: "feature"
+      },
+      {
+        question: "He had to pay a [    ] for speeding.",
+        options: ["improve", "fine", "submit", "observe"],
+        answer: "fine"
+      },
+      {
+        question: "She has [    ] working hours.",
+        options: ["observe", "submit", "flexible", "improve"],
+        answer: "flexible"
+      },
+      {
+        question: "The weather [    ] predicts rain.",
+        options: ["submit", "forecast", "improve", "manage"],
+        answer: "forecast"
+      },
+      {
+        question: "The ship was carrying [    ].",
+        options: ["manage", "freight", "submit", "observe"],
+        answer: "freight"
+      },
+      {
+        question: "The software&#x27;s main [    ] is data analysis.",
+        options: ["observe", "manage", "improve", "function"],
+        answer: "function"
+      },
+      {
+        question: "This machine [    ]s electricity.",
+        options: ["improve", "observe", "submit", "generate"],
+        answer: "generate"
+      },
+      {
+        question: "They received a [    ] for the research.",
+        options: ["observe", "improve", "manage", "grant"],
+        answer: "grant"
+      },
+      {
+        question: "Please follow the [    ] carefully.",
+        options: ["submit", "improve", "guideline", "manage"],
+        answer: "guideline"
+      },
+      {
+        question: "We will [    ] the new strategy next week.",
+        options: ["manage", "submit", "observe", "implement"],
+        answer: "implement"
+      },
+      {
+        question: "Bonuses are given as an [    ].",
+        options: ["submit", "improve", "incentive", "observe"],
+        answer: "incentive"
+      },
+      {
+        question: "You may [    ] extra charges.",
+        options: ["manage", "improve", "observe", "incur"],
+        answer: "incur"
+      },
+      {
+        question: "The results [    ] a need for change.",
+        options: ["manage", "improve", "indicate", "submit"],
+        answer: "indicate"
+      },
+      {
+        question: "The building passed the [    ].",
+        options: ["observe", "submit", "inspection", "manage"],
+        answer: "inspection"
+      },
+      {
+        question: "The technician will [    ] the system.",
+        options: ["install", "submit", "observe", "improve"],
+        answer: "install"
+      },
+      {
+        question: "The [    ] provides training programs.",
+        options: ["manage", "institute", "observe", "improve"],
+        answer: "institute"
+      },
+      {
+        question: "Do you have health [    ]?",
+        options: ["insurance", "submit", "observe", "improve"],
+        answer: "insurance"
+      },
+      {
+        question: "They [    ] to expand next year.",
+        options: ["manage", "observe", "intend", "submit"],
+        answer: "intend"
+      },
+      {
+        question: "There was a brief [    ] in service.",
+        options: ["manage", "interruption", "submit", "observe"],
+        answer: "interruption"
+      },
+      {
+        question: "We check the [    ] every month.",
+        options: ["submit", "observe", "inventory", "manage"],
+        answer: "inventory"
+      },
+      {
+        question: "Your travel [    ] is attached.",
+        options: ["itinerary", "observe", "manage", "submit"],
+        answer: "itinerary"
+      },
+      {
+        question: "We signed a one-year [    ].",
+        options: ["lease", "submit", "observe", "improve"],
+        answer: "lease"
+      },
+      {
+        question: "He lost his [    ] at the airport.",
+        options: ["manage", "luggage", "observe", "submit"],
+        answer: "luggage"
+      },
+      {
+        question: "It’s hard to [    ] that level of quality.",
+        options: ["observe", "submit", "maintain", "manage"],
+        answer: "maintain"
+      },
+      {
+        question: "You can [    ] the document before sending.",
+        options: ["modify", "submit", "improve", "manage"],
+        answer: "modify"
+      },
+      {
+        question: "We need to [    ] a better price.",
+        options: ["negotiate", "observe", "manage", "submit"],
+        answer: "negotiate"
+      },
+      {
+        question: "You have a legal [    ] to respond.",
+        options: ["manage", "improve", "obligation", "observe"],
+        answer: "obligation"
+      },
+      {
+        question: "He [    ]s heavy machinery.",
+        options: ["manage", "observe", "operate", "improve"],
+        answer: "operate"
+      },
+      {
+        question: "She is an [    ] employee.",
+        options: ["manage", "outstanding", "observe", "improve"],
+        answer: "outstanding"
+      },
+      {
+        question: "Here&#x27;s an [    ] of the project.",
+        options: ["overview", "submit", "observe", "improve"],
+        answer: "overview"
+      },
+      {
+        question: "He applied for a [    ].",
+        options: ["observe", "improve", "submit", "patent"],
+        answer: "patent"
+      },
+      {
+        question: "The match was [    ]d due to rain.",
+        options: ["submit", "improve", "observe", "postpone"],
+        answer: "postpone"
+      },
+      {
+        question: "As a [    ], wear gloves.",
+        options: ["manage", "observe", "submit", "precaution"],
+        answer: "precaution"
+      },
+      {
+        question: "We’re [    ]ing new staff.",
+        options: ["observe", "improve", "recruit", "manage"],
+        answer: "recruit"
+      },
+      {
+        question: "He is a [    ] colleague.",
+        options: ["observe", "reliable", "submit", "manage"],
+        answer: "reliable"
+      },
+      {
+        question: "This is a [    ] for your appointment.",
+        options: ["reminder", "observe", "manage", "submit"],
+        answer: "reminder"
+      },
+      {
+        question: "She is a [    ] scientist.",
+        options: ["renowned", "submit", "observe", "manage"],
+        answer: "renowned"
+      },
+      {
+        question: "Please [    ] your form by Monday.",
+        options: ["manage", "submit", "observe", "improve"],
+        answer: "submit"
+      },
+      {
+        question: "They [    ]ed the service temporarily.",
+        options: ["observe", "improve", "manage", "suspend"],
+        answer: "suspend"
+      },
+      {
+        question: "He gave [    ] examples.",
+        options: ["observe", "improve", "manage", "tangible"],
+        answer: "tangible"
+      },
+      {
+        question: "The store&#x27;s [    ] doubled.",
+        options: ["manage", "improve", "observe", "turnover"],
+        answer: "turnover"
+      },
+      {
+        question: "That’s not a [    ] option.",
+        options: ["viable", "submit", "observe", "manage"],
+        answer: "viable"
+      }
+    ];
+
+    let questions = [];
+    const container = document.getElementById("quiz-container");
+    const summary = document.getElementById("summary");
+    const restartBtn = document.getElementById("restart-btn");
+    const submitBtn = document.getElementById("submit-btn");
+
+    function renderQuiz() {
+      container.innerHTML = "";
+      summary.style.display = "none";
+      restartBtn.style.display = "none";
+      submitBtn.style.display = "inline-block";
+
+      questions = fullQuizData.sort(() => 0.5 - Math.random()).slice(0, 10);
+
+      questions.forEach((q, index) => {
+        const box = document.createElement("div");
+        box.className = "quiz-box";
+        box.innerHTML = `
+          <div class="question">Q${index + 1}: ${q.question}</div>
+          <div class="choices">
+            ${q.options.map(opt => `
+              <label>
+                <input type="radio" name="q${index}" value="${opt}"> ${opt}
+              </label>
+            `).join("")}
+          </div>
+        `;
+        container.appendChild(box);
+      });
+    }
+
+    submitBtn.addEventListener("click", function () {
+      let correct = 0;
+      questions.forEach((q, i) => {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selected && selected.value === q.answer) {
+          correct++;
+        }
+      });
+      const total = questions.length;
+      summary.style.display = "block";
+      summary.innerHTML = `<h2>Your Score: ${correct} / ${total}</h2>`;
+
+      const prevCorrect = parseInt(localStorage.getItem(`vocabCorrect${level}{mode}`)) || 0;
+      const prevTotal = parseInt(localStorage.getItem(`vocabTotal${level}{mode}`)) || 0;
+      localStorage.setItem(`vocabCorrect${level}{mode}`, prevCorrect + correct);
+      localStorage.setItem(`vocabTotal${level}{mode}`, prevTotal + total);
+
+      submitBtn.style.display = "none";
+      restartBtn.style.display = "inline-block";
+    });
+
+    restartBtn.addEventListener("click", function () {
+      renderQuiz();
+    });
+
+    renderQuiz();
+  </script>
+</body>
+</html>
